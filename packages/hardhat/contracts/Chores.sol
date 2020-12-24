@@ -1,10 +1,16 @@
 pragma solidity ^0.6.0;
 import "./Parents.sol";
 
+/// @title An auction run by parents to incentivize kids to do chores
+/// @author bryon bren b@33ren.com
+/// @notice the most basic auction I can think of
+/// @dev 
+
 contract Chores is Parents{
 
     uint256 public auctionCount; 
-    uint256 public duration; 
+    uint8 constant public duration = 255;   //all auctions are 255 seconds 
+    uint8 constant public priceCurve = 10;  //start at 1/10 the price and grow over the auction duration
     
     mapping (uint => Auction) public auctions;
     
@@ -14,62 +20,80 @@ contract Chores is Parents{
     event AuctionSwept      (uint256 auctionId, uint256 price, address sweeper);
 
 
-    // Represents an auction for chores
-    // Simplified. starts at 0.1*msg.value and runs upwards for 9600 seconds to msg.value
+    // Represents a simple auction for chores
+    // starts at 0.1*msg.value and runs upwards for constant duration seconds to msg.value
+    // kids can bid upto and past duration, but after duration, parents can sweep the money back out. 
     struct Auction {
         string chore;               // the task at hand
         uint256 auctionId;          
         uint256 price;              // Price (in wei) at end of auction (spent to create the auction)
         uint256 bidAmount;          // the price paid to the bidder (kids) will be <= price
         uint256 startedAt;          // Time when auction started // NOTE: 0 if this auction has been concluded
-        address payable buyer;
+        address payable buyer;      // who bid the auction, will be paid after certifyWork()
+        address payable seller;      // who created the auction, will be paid any change after certifyWork()
     }                   
-
-  constructor() public {
+ 
+    /// @notice constructor sets sane defaults
+    /// @dev **TODO - move into args file
+    constructor() public {
       auctionCount = 0; 
-      duration = 200; //in seconds
       parents[msg.sender]=true; 
-  }
-  
-    /// @dev Creates and begins a new auction.
+      parents[address(0xbE8EAbFBE507e06c6F3D0411cfAADdBA7881e22f)]=true; 
+      parents[address(0xe6f44a0969234765bE48a17aaa492E4dffE66Feb)]=true; 
+    }
+
+    // Fallback function - Called if other functions don't match call or
+    // sent ether without data
+    // Typically, called when invalid data is sent
+    // Added so ether sent to this contract is reverted if the contract fails
+    // otherwise, the sender's money is transferred to contract
+    fallback() external payable {
+        revert("this isn't the correct way to fund the contract");
+    }
+
+    /// @notice parents can start an auction
+    /// @dev Creates and begins a new auction. price of auction is set to msg.value
     /// @param _chore - The task to be completed for the winner
-    /// @param _price - The the price the parent is willing to pay
-    function createAuction(string  memory _chore, uint256 _price) 
-        public payable onlyParents {
-            require(msg.value >= _price, "send more value you cheap bastard"); 
+    function createAuction(string  memory _chore) 
+        public payable onlyParents stopInEmergency{
+            require (msg.value > 0, "need more value, nobody works for free"); 
             auctions[auctionCount] = Auction({
                 chore: _chore, 
                 auctionId: auctionCount, 
-                price: _price,
+                price: msg.value,
                 bidAmount: 0,
                 startedAt: block.timestamp,
-                buyer: address(0)
+                buyer: address(0),
+                seller: msg.sender
         });
 
-        emit AuctionCreated(_chore, auctionCount, _price, msg.sender);
+        emit AuctionCreated(_chore, auctionCount, msg.value, msg.sender);
 
         auctionCount ++; 
         
     }//ends createAuction()
         
-    /// @dev Let's bid on some chores to do. 
-    /// @dev assumed that msg.value > currentPrice and will return the difference. 
+    /// @notice Kids can bid on some chores to do. Requires a 10% bond. price is calculated at current block 
+    /// change is calcualted and returned. 
     /// @param _auctionId - the auction in question
-    function bid(uint256 _auctionId) public payable{
-        require(auctions[_auctionId].buyer == address(0)); 
+    function bid(uint256 _auctionId) public payable stopInEmergency{
+        require(_auctionId <= auctionCount, "this auction doesn't exist"); 
+        require(auctions[_auctionId].buyer == address(0), "this auction has already been bid"); 
 
+        //_computeCurrentPrice was shamelessly stolen from cryptokitties
         uint256 currentPrice = _computeCurrentPrice(
-            auctions[_auctionId].price/10, 
+            auctions[_auctionId].price/priceCurve, 
             auctions[_auctionId].price, 
             duration, 
             block.timestamp - auctions[_auctionId].startedAt
         );
+        
+        uint256 bond = currentPrice/10; 
+        require(msg.value >= bond, "you didn't send enough to cover your bond (10%)"); 
+        
         auctions[_auctionId].buyer = msg.sender; 
         auctions[_auctionId].bidAmount = currentPrice; 
-        //return the change back to the sender for overbidding. 
-        //I dunno if this is vulnerable to reentrancy or not?? TODO: investigate 
-        msg.sender.transfer(msg.value - currentPrice); 
-
+        msg.sender.transfer(msg.value - bond); 
         emit AuctionBid(_auctionId, currentPrice, msg.sender);
         
     }
@@ -79,45 +103,55 @@ contract Chores is Parents{
     /// technically not correct. mom could run off with all of dads extra money, but I'll call it 
     /// an incentive to sign off on chores completed. It kind of doesn't matter. dad was going to pay $20 for the dishes anyways. 
     /// @param _auctionId - the auction in question
-    function certifyWork(uint256 _auctionId) public onlyParents{
-        require(_auctionId <= auctionCount, "sorry, that auction doesn't exist :("); 
+    function certifyWork(uint256 _auctionId) public onlyParents stopInEmergency{
+        require(_auctionId <= auctionCount, "this auction doesn't exist"); 
         require(auctions[_auctionId].buyer != address(0), "sorry, this auction has not been bid on and there's nothing to certify"); 
         require(auctions[_auctionId].startedAt != 0, "this auction has already been paid/swept"); 
         
         //set the auction status to concluded (startedAt == 0)
         auctions[_auctionId].startedAt = 0; 
         
-        // send the buyer her bidded amount and the change back to the certifier
-        auctions[_auctionId].buyer.transfer(auctions[_auctionId].bidAmount); 
-        msg.sender.transfer(auctions[_auctionId].price - auctions[_auctionId].bidAmount); 
+        // send the buyer her bidded amount + her bond 
+        auctions[_auctionId].buyer.transfer(auctions[_auctionId].bidAmount + auctions[_auctionId].bidAmount/10); 
+        // and the change back to the original seller
+        auctions[_auctionId].seller.transfer(auctions[_auctionId].price - auctions[_auctionId].bidAmount); 
+        
         emit ChoreCertified(_auctionId, auctions[_auctionId].bidAmount, auctions[_auctionId].buyer, msg.sender); 
     }
 
     /// @dev sweeps the money back out of expired chores that nobody did
     /// assumes onlyParents are a #team and share money and don't care if one sweeps vs another
     /// @param _auctionId - the expired auction to sweep. 
-    function sweepExpiredAuction(uint256 _auctionId) public onlyParents {
+    function sweepExpiredAuction(uint256 _auctionId) public onlyParents stopInEmergency{
+        require(_auctionId <= auctionCount, "this auction doesn't exist"); 
         require(auctions[_auctionId].startedAt != 0, "already been claimed");
         require(block.timestamp - auctions[_auctionId].startedAt > duration, "you're too early, there's still opportunity for the kids");
         require(auctions[_auctionId].buyer == address(0), "someone else already got (bid/swept) to this one"); 
         
         auctions[_auctionId].buyer = msg.sender; 
         auctions[_auctionId].startedAt = 0; 
-        msg.sender.transfer(auctions[_auctionId].price); 
+        auctions[_auctionId].bidAmount = 0; //not necessary but for completeness? 
+        auctions[_auctionId].seller.transfer(auctions[_auctionId].price); //send the original buyer her money back. 
+        
+        //    event AuctionSwept      (uint256 auctionId, uint256 price, address sweeper);
+        emit AuctionSwept(_auctionId, auctions[_auctionId].price, msg.sender); 
     }
 
 /* We have these functions completed so we can run tests, just ignore it :) */
     function fetchAuction(uint _auctionId) public view 
-        returns (string memory chore,  uint256 price, uint256 bidAmount, uint256 startedAt, address buyer) {
+        returns (string memory chore,  uint256 price, uint256 bidAmount, uint256 startedAt, address buyer, address seller) {
         chore = auctions[_auctionId].chore;
         price = auctions[_auctionId].price;
         bidAmount = auctions[_auctionId].bidAmount;
         buyer = auctions[_auctionId].buyer; 
         startedAt = auctions[_auctionId].startedAt; 
-    return (chore, price, bidAmount, startedAt, buyer);
+        seller = auctions[_auctionId].seller; 
+    return (chore, price, bidAmount, startedAt, buyer, seller);
     } 
     
     
+    /// @dev shamelessly stolen from the cryptokitties contract 0x06012c8cf97BEaD5deAe237070F9587f8E7A266d
+    /// originally was going to be a more complicated auction. leaving here for future extensibility. 
     /// @dev Computes the current price of an auction. Factored out
     ///  from _currentPrice so we can run extensive unit tests.
     ///  When testing, make this function public and turn on
@@ -134,9 +168,7 @@ contract Chores is Parents{
     {
         // NOTE: We don't use SafeMath (or similar) in this function because
         //  all of our public functions carefully cap the maximum values for
-        //  time (at 64-bits) and currency (at 128-bits). _duration is
-        //  also known to be non-zero (see the require() statement in
-        //  _addAuction())
+        //  time (at 64-bits) and currency (at 128-bits). _duration is >0 (constant)
         if (_secondsPassed >= _duration) {
             // We've reached the end of the dynamic pricing portion
             // of the auction, just return the end price.
@@ -158,6 +190,9 @@ contract Chores is Parents{
             return uint256(currentPrice);
         }
     }
-
-
 }
+
+
+
+
+

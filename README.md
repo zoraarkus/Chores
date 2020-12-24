@@ -1,3 +1,19 @@
+//scaffold-eth shamelessly stolen from the great Austin Griffith. thank you.  
+>  my first attempt writing a solidity project. 
+> do not use for real funds!! only as a concept to graduate :)
+## motivation!
+
+a simple auction where a Parent can put up a reverse auction for a chore to do. 
+Parents createAuction() that starts at 1/10 msg.value and after $DURATION minutes will reach maximum value linearly. 
+kids are incentivized to underbid  their sister for the work. createing a truer market price for something like "the dishes" 
+when kids bid(), they must put up a bond  for 1/10 the currentAuctionPrice that goes into the contract. 
+She can only get this back + bidAmount if a Parent certifies() her work. 
+
+this is not a real auction and I've made some assumptions that make it a simpler project. 
+
+
+
+
 # 🏗 scaffold-eth
 
 > is everything you need to get started building decentralized applications powered by smart contracts
