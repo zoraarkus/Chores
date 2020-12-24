@@ -12,7 +12,7 @@ She can only get this back + bidAmount if a Parent certifies() her work.
 this is not a real auction and I've made some assumptions that make it a simpler project. 
 
 
-
+<!-- 
 
 # 🏗 scaffold-eth
 
@@ -756,3 +756,4 @@ OR
 
 yarn run ipfs
 ```
+a normal html comment -->
