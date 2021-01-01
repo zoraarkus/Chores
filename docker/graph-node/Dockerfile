@@ -51,6 +51,8 @@ ENV node_role "combined-node"
 ENV node_id "default"
 
 # HTTP port
+EXPOSE 8545 
+# HTTP port
 EXPOSE 8000
 # WebSocket port
 EXPOSE 8001
