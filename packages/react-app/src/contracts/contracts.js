@@ -1,1 +1,1 @@
-module.exports = ["Chores","Parents"];
+module.exports = ["Chores","CircuitBreaker","Parents","YourContract"];
