@@ -1,3 +1,24 @@
+type Chore @entity {
+  id: ID!
+  seller: People!
+  buyer: People
+  chore: String!
+  createdAt: BigInt!
+  price: BigInt
+  bid: BigInt
+  certifiedby: People
+  transactionHash: String!
+}
+
+type People @entity {
+  id: ID!
+  createdAt: BigInt!
+  address: Bytes!
+  choresSold: [Chore!] @derivedFrom(field: "seller")
+  amtChoresSold: BigInt
+  amtChoresBought: BigInt
+}
+
 type Purpose @entity {
   id: ID!
   sender: Sender!

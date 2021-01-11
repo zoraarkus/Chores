@@ -99,7 +99,9 @@ function App(props) {
 
   //📟 Listen for broadcast events
   const setPurposeEvents = useEventListener(readContracts, "YourContract", "SetPurpose", localProvider, 1);
+  const newAuctionEvents = useEventListener(readContracts, "Chores", "AuctionCreated", localProvider, 1);
   console.log("📟 SetPurpose events:",setPurposeEvents)
+  console.log("📟 newAuctionEvents:",newAuctionEvents)
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
@@ -203,6 +205,7 @@ function App(props) {
             tx={tx}
             writeContracts={writeContracts}
             mainnetProvider={mainnetProvider}
+            newAuctionEvents={newAuctionEvents}
             />
           </Route>
           <Route path="/subgraph">
