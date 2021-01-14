@@ -6,7 +6,7 @@ type Chore @entity {
   createdAt: BigInt!
   price: BigInt
   bid: BigInt
-  certifiedby: People
+  certifiedBy: People
   transactionHash: String!
 }
 

@@ -1,8 +1,16 @@
 import { BigInt, Address } from "@graphprotocol/graph-ts"
 import { Chore, People } from "../generated/schema"
 import { Purpose, Sender } from "../generated/schema"
-import { Chores, AuctionCreated, AuctionBid } from "../generated/Chores/Chores"
+import { Chores, AuctionCreated, AuctionBid, ChoreCertified } from "../generated/Chores/Chores"
 import { YourContract, SetPurpose } from "../generated/YourContract/YourContract"
+
+export function handleChoreCertified(event: ChoreCertified): void {
+  let chore = Chore.load(event.params.auctionId.toString())
+  chore.certifiedBy = event.params.certifier.toHexString()
+  chore.price = event.params.price
+
+  chore.save()
+}
 
 export function handleAuctionBid(event: AuctionBid): void {
   let buyerString = event.params.winner.toHexString()

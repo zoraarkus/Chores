@@ -35,23 +35,9 @@ function Chores(props) {
      chore 
       price
       createdAt
-     buyer 
-      seller{
-        id
-      }
-    }
-    purposes(first: 25, orderBy: createdAt, orderDirection: desc) {
-      id
-      purpose
-      createdAt
-      sender {
-        id
-      }
-    }
-    senders {
-      id
-      address
-      purposeCount
+      certifiedBy{id}
+     buyer {id}
+      seller{id}
     }
   }
   `
@@ -77,6 +63,19 @@ function Chores(props) {
                       />
     },
     {
+      title: 'buyer',
+      key: 'id',
+      render: (record) => 
+        record.buyer ?  <Address value={record.buyer.id} fontSize={16} />
+                    : "no buyer yet"
+    },
+    {
+      title: 'certifier',
+      key: 'id',
+      render: (record) =>
+          <Address value={record.certifiedBy ? record.certifiedBy.id : ""} fontSize={16} />
+    },
+    {
       title: 'status',
       key: 'status',
       render: (record) => <div style={{ marginTop: 32 }}>
@@ -94,12 +93,19 @@ function Chores(props) {
       title: 'Action',
       key: 'asdf',
       dataIndex: '',
-        render: (record) => 
+        render: (record) =>
+        ! record.buyer 
+            ?
             <Button onClick={()=>{
                 props.tx( props.writeContracts.Chores.bid(record.id,{
                     value: record.price/10 //parseEther("0.0001")
             }))
               }}>Bid on this for {formatEther(record.price/10)}</Button>
+            :
+            <Button onClick={()=>{
+                props.tx( props.writeContracts.Chores.certifyWork(record.id))
+            }}>Certify </Button>
+        
     },
     {
       title: 'Created At',
@@ -108,30 +114,6 @@ function Chores(props) {
       render: d => (new Date(d * 1000)).toISOString()
     },
     ];
-  const purposeColumns = [
-    {
-      title: 'Purpose',
-      dataIndex: 'purpose',
-      key: 'purpose',
-    },
-    {
-      title: 'Sender',
-      key: 'id',
-      render: (record) => <Address
-                        value={record.sender.id}
-                        ensProvider={props.mainnetProvider}
-                        fontSize={16}
-                      />
-    },
-    {
-      title: 'createdAt',
-      key: 'createdAt',
-      dataIndex: 'createdAt',
-      render: d => (new Date(d * 1000)).toISOString()
-    },
-    ];
-
-  const [newPurpose, setNewPurpose] = useState("loading...");
   const [newChore, createNewChore, bidOnChore] = useState("loading...");
 
 
@@ -151,8 +133,7 @@ function Chores(props) {
               <Input onChange={(e)=>{createNewChore(e.target.value)}} />
               <Button onClick={()=>{
                 console.log("newChore",newChore)
-                console.log("newAuctionEvent",props.newAuctionEvent)
-                /* look how you call setPurpose on your contract: */
+                console.log("newAuctionEvent",props.newAuctionEvents)
                 props.tx( props.writeContracts.Chores.createAuction(newChore,{
                     value: parseEther("0.001")
             }))

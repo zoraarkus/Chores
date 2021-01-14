@@ -11,7 +11,6 @@ import { useExchangePrice, useGasPrice, useUserProvider, useContractLoader, useC
 import { Header, Account, Faucet, Ramp, Contract, GasGauge } from "./components";
 import { Transactor } from "./helpers";
 import { formatEther } from "@ethersproject/units";
-//import Hints from "./Hints";
 import { Hints, ExampleUI, Subgraph, Chores } from "./views"
 /*
     Welcome to 🏗 scaffold-eth !
@@ -201,16 +200,12 @@ function App(props) {
           </Route>
           <Route path="/chores">
             <Chores
-            subgraphUri={props.subgraphUri}
             tx={tx}
             writeContracts={writeContracts}
-            mainnetProvider={mainnetProvider}
-            newAuctionEvents={newAuctionEvents}
             />
           </Route>
           <Route path="/subgraph">
             <Subgraph
-            subgraphUri={props.subgraphUri}
             tx={tx}
             writeContracts={writeContracts}
             mainnetProvider={mainnetProvider}

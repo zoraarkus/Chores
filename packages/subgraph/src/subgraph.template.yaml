@@ -23,7 +23,9 @@ dataSources:
         - event: AuctionCreated(string,uint256,uint256,address)
           handler: handleNewAuction 
         - event: AuctionBid(uint256,uint256,address)
-          handler: handleAuctionBid 
+          handler: handleAuctionBid
+        - event: ChoreCertified(uint256,uint256,address,address)
+          handler: handleChoreCertified
       file: ./src/mapping.ts
   - kind: ethereum/contract
     name: YourContract
