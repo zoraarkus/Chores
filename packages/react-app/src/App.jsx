@@ -200,7 +200,14 @@ function App(props) {
           </Route>
           <Route path="/chores">
             <Chores
+	    address={address}
+	    userProvider={userProvider}
+	    mainnetProvider={mainnetProvider}
+	    localProvider={localProvider}
+	    yourLocalBalance={yourLocalBalance}
+	    price={price}
             tx={tx}
+            subgraphUri={props.subgraphUri}
             writeContracts={writeContracts}
             />
           </Route>
@@ -208,6 +215,7 @@ function App(props) {
             <Subgraph
             tx={tx}
             writeContracts={writeContracts}
+            subgraphUri={props.subgraphUri}
             mainnetProvider={mainnetProvider}
             />
           </Route>

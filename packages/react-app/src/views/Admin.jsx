@@ -15,7 +15,7 @@ import { parseUnits, parseEther, formatEther } from "@ethersproject/units";
 
   const highlight = { marginLeft: 4, marginRight: 8, backgroundColor: "#f9f9f9", padding: 4, borderRadius: 4, fontWeight: "bolder" }
 
-function Chores(props) {
+function Admin(props) {
 
   function graphQLFetcher(graphQLParams) {
     console.log(props.subgraphUri); 
@@ -180,4 +180,4 @@ function Chores(props) {
   );
 }
 
-export default Chores;
+export default Admin;
