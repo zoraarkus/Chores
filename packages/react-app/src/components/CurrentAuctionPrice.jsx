@@ -21,7 +21,7 @@ export default function CurrentAuctionPrice(props) {
   const spoof = ()=>{
     const duration = 255; 
     const now = Math.round(new Date().getTime()/1000); 
-    const elapsed = now - props.startTime + 90; //***WHY adding 90 seconds? who the fuck knows... hardhat and react are on different times? 
+    const elapsed = now - props.startTime + 110; //***WHY adding 90 seconds? who the fuck knows... hardhat and react are on different times? 
     const totalPriceChange =  ethers.BigNumber.from(ethers.BigNumber.from(props.price).sub(ethers.BigNumber.from(props.price).div(10))); 
     const currentPriceChange = totalPriceChange.mul(elapsed).div(duration); 
     const currentPrice = ethers.BigNumber.from(props.price).div(10).add(currentPriceChange); 
