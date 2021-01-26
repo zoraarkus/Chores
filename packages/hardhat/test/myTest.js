@@ -11,6 +11,10 @@ describe("lazy kids", function () {
     it("Should deploy chores somehow", async function () {
       const Chores = await ethers.getContractFactory("Chores");
       myContract = await Chores.deploy();
+<<<<<<< HEAD
+=======
+//        console.log(myContract); 
+>>>>>>> 8c6cc76a724f2cb2afe41ff4fa045bc4200ed6cd
     });
 
     describe("pauseContract()", function () {
