@@ -154,21 +154,13 @@ function Chores(props) {
 	<div style={{ width:400,marginTop:8,border:"1px solid #cccccc",padding:8}}>
               <Button onClick={()=>{
                 props.tx( props.writeContracts.Chores.togglePauseContract()) 
-<<<<<<< HEAD
             }}>{props.paused ? "unpause" : "pause"  } this contract</Button>
 		
-=======
-            }}>Pause/Unpause this contract</Button>
->>>>>>> 8c6cc76a724f2cb2afe41ff4fa045bc4200ed6cd
 	</div>
 	<div style={{ width:400,marginTop:8,border:"1px solid #cccccc",padding:8}}>
               <Button onClick={()=>{
                 props.tx( props.writeContracts.Chores.rugPull()) 
-<<<<<<< HEAD
             }}>pull the rug from everyone and run!</Button>
-=======
-            }}>rugpull this bitch</Button>
->>>>>>> 8c6cc76a724f2cb2afe41ff4fa045bc4200ed6cd
 	</div>
 <br/>
           <div style={{width:780, margin: "auto", paddingBottom:64}}>
