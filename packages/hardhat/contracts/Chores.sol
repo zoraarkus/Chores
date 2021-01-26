@@ -38,9 +38,7 @@ contract Chores is Parents{
     constructor() public {
       auctionCount = 0; 
       parents[msg.sender]=true; 
-      parents[address(0x9B0C89b9E698Aa887Ee51AF06eF63DBfBDE2bADc)]=true; 
-      parents[address(0xbE8EAbFBE507e06c6F3D0411cfAADdBA7881e22f)]=true; 
-      parents[address(0xe6f44a0969234765bE48a17aaa492E4dffE66Feb)]=true; 
+      parents[address(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266)]=true; 
     }
 
     // Fallback function - Called if other functions don't match call or

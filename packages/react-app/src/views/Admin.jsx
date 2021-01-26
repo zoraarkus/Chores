@@ -88,8 +88,9 @@ function Chores(props) {
 
   return (
       <>
-        <div style={{width:800, }}>
+      <div style={{border:"1px solid #cccccc", padding:16, width:800, margin:"auto",marginTop:64}}>
             <Account
+	    style={{width:800}}
             address={props.writeContracts?props.writeContracts.Chores.address:0x0}
             localProvider={props.localProvider}
             injectedProvider={props.userProvider}
@@ -99,20 +100,21 @@ function Chores(props) {
             {"Chores:ADMIN"}
 
 
-    <div style={{width:780,marginTop:8,padding:8}}>{""}
+    <div style={{ width:400,marginTop:8,border:"1px solid #cccccc",padding:8}}>
                 <AddressInput
                 ensProvider={props.ensProvider}
                 placeholder="got married? add new Parents here"
                 value={addedParent}
                 onChange={addParent}
                 />
-              <Button onClick={()=>{
+              <Button 
+		onClick={()=>{
                 console.log("addParent",addedParent)
                 props.tx( props.writeContracts.Chores.addParent(addedParent,{ })) 
             }}>Add Parent</Button>
           </div>
 
-    <div style={{width:780,marginTop:8,padding:8}}>
+	<div style={{ width:400,marginTop:8,border:"1px solid #cccccc",padding:8}}>
                 <AddressInput
                 ensProvider={props.ensProvider}
                 placeholder="revoke parenthood here!"
@@ -124,22 +126,19 @@ function Chores(props) {
                 props.tx( props.writeContracts.Chores.revokeParenthood(revokedParent,{ })) 
             }}>Revoke Parent</Button>
 
-          </div>
-            <div style={{width:780,marginTop:8,padding:8}}>
+	</div>
+	<div style={{ width:400,marginTop:8,border:"1px solid #cccccc",padding:8}}>
               <Button onClick={()=>{
                 props.tx( props.writeContracts.Chores.togglePauseContract()) 
             }}>Pause/Unpause this contract</Button>
-            </div>
-
-            <div style={{width:780,marginTop:8,padding:8}}>
+	</div>
+	<div style={{ width:400,marginTop:8,border:"1px solid #cccccc",padding:8}}>
               <Button onClick={()=>{
                 props.tx( props.writeContracts.Chores.rugPull()) 
             }}>rugpull this bitch</Button>
-            </div>
-
+	</div>
+<br/>
           <div style={{width:780, margin: "auto", paddingBottom:64}}>
-
-
 
             {data?<Table dataSource={data.peoples} columns={peopleColumns} rowKey={"id"} />:<Typography>{(loading?"Loading...":deployWarning)}</Typography>}
 

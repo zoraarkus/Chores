@@ -12,7 +12,7 @@ describe("lazy kids", function () {
       const Chores = await ethers.getContractFactory("Chores");
 
       myContract = await Chores.deploy();
-        console.log(myContract); 
+//        console.log(myContract); 
     });
 
     describe("pauseContract()", function () {

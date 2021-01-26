@@ -1,1 +1,5 @@
-**TODO** automate this using yarn deploy!
+Chores is deployed (and Source Verified!) on xDai:0x28Bcd7e68f44e71A1Db3899946905bcB895410A3
+
+https://blockscout.com/poa/xdai/address/0x28Bcd7e68f44e71A1Db3899946905bcB895410A3/transactions
+
+
