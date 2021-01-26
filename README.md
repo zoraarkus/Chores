@@ -4,9 +4,12 @@
 ## motivation!
 
 a simple auction where a Parent can put up a reverse auction for a chore to do. 
+
 Parents createAuction() that starts at 1/10 msg.value and after $DURATION minutes will reach maximum value linearly. 
 kids are incentivized to underbid  their sister for the work. trying to find a true market price for something like "do the dishes" 
+
 when kids bid(), they must put up a bond  for 1/10 the currentAuctionPrice that goes into the contract. DDOS protection.
+
 they can only get this back + bidAmount if a Parent certifies() her work. 
 
 Initally I had grand plans and this was going ot be more elaborate that it actually turned out. Rather than refactoring and simplifying my contracts, I left them extensible and hard-coded some assumptions that make it a simpler project. 
@@ -21,14 +24,20 @@ The project is basically 3x parts:
 >#3 - react frontend lives in packages/react-app/ 
 
 Most everything is copy/pasta'd from scaffold-eth with the exception of the following: 
+
     - contratcs (Chores.sol Parents.sol CircuitBreaker.sol) in packages/hardhat/contracts/
+
     - subgraph build (mapping.ts schema.graphql subgraph.template.yaml
+
     - react components (CurrentAuctionPrice.jsx SimpleBalance.jsx) in /packages/react-app/src/components. 
+
     - react views (Chores.jsx Admin.jsx) in packages/react-app/src/components/ 
 
 Since I'm running ubuntu as a guest VirtualBox in a Windows 10 host, I had to: 
+
     - configure docker networking to look at the localblockchain here 
       ethereum: 'localhost:http://10.0.2.15:8545'
+
     - configure hardhat to use --hostname 0.0.0.0 
 
 <!-- 
