@@ -13,10 +13,10 @@ Initally I had grand plans and this was going ot be more elaborate that it actua
 
 The project is basically 3x parts: 
 
-#1 - blockchain/contracts locations in packages/hardhat/ 
+>#1 - blockchain/contracts locations in packages/hardhat/ 
     I shamelessly stole the auction concept/code  form the cryptokitties contract /0x06012c8cf97bead5deae237070f9587f8e7a266d
-#2 - graph node/subgraph  lives in packeages/subgraph/
-#3 - react frontend lives in packages/react-app/ 
+>#2 - graph node/subgraph  lives in packeages/subgraph/
+>#3 - react frontend lives in packages/react-app/ 
 
 Most everything is copy/pasta'd from scaffold-eth with the exception of the following: 
     - contratcs (Chores.sol Parents.sol CircuitBreaker.sol) in packages/hardhat/contracts/
