@@ -177,22 +177,16 @@ function Chores(props) {
   return (
       <>
 
-          <div style={{padding:64}}>
-        <div style={{ float: "left" }}>
+        <div style={{width:1000,padding:16,margin:"auto", marginTop:10 }}>
             <Account
-            address={props.writeContracts?props.writeContracts.Chores.address:"loading...."}
+            address={props.readContracts?props.readContracts.Chores.address:"loading...."}
             localProvider={props.localProvider}
             injectedProvider={props.userProvider}
             mainnetProvider={props.mainnetProvider}
             price={0}
             />
-            {props.writeContracts.Chores.name}
-        </div>
-          ...
-          </div>
-          <div style={{width:780, margin: "auto", paddingBottom:64}}>
 
-            <div style={{margin:32, textAlign:'right'}}>
+	    <div style={{ width:400,marginTop:8,border:"1px solid #cccccc",padding:8}}>
               <Input onChange={(e)=>{createNewChore(e.target.value)}} />
 		<EtherInput
 		onChange={value=>{setNewChoreAmount(value)}}
@@ -207,15 +201,12 @@ function Chores(props) {
             }))
               }}>New Chore</Button>
             </div>
+<br/>
 
 
             {data?<Table dataSource={data.chores} columns={choreColumns} rowKey={"id"} />:<Typography>{(loading?"Loading...":deployWarning)}</Typography>}
+            </div>
 
-          </div>
-
-          <div style={{padding:64}}>
-          ...
-          </div>
             <div style={{margin:0, height:800, border:"1px solid #888888", textAlign:'left'}}>
               <GraphiQL fetcher={graphQLFetcher} docExplorerOpen={true} query={EXAMPLE_GRAPHQL}/>
             </div>

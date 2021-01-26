@@ -222,7 +222,7 @@ function App(props) {
 	    price={price}
             tx={tx}
             subgraphUri={props.subgraphUri}
-              readContracts={readContracts}
+            readContracts={readContracts}
             writeContracts={writeContracts}
             />
           </Route>

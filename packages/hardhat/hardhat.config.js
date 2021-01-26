@@ -17,7 +17,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "xdai";
+const defaultNetwork = "localhost";
 
 function mnemonic() {
   try {
@@ -72,7 +72,7 @@ module.exports = {
     },
     xdai: {
       url: 'https://dai.poa.network',
-      gasPrice: 76000000000,
+      gasPrice: 1000000000,
       accounts: {
         mnemonic: mnemonic(),
       },
