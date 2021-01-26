@@ -2,7 +2,7 @@ pragma solidity ^0.6.0;
 import "./Parents.sol";
 
 /// @title An auction run by parents to incentivize kids to do chores
-/// @author bryon bren b@33ren.com
+/// @author bryon b@33ren.com
 /// @notice the most basic auction I can think of
 /// @dev 
 
@@ -38,6 +38,7 @@ contract Chores is Parents{
     constructor() public {
       auctionCount = 0; 
       parents[msg.sender]=true; 
+      parents[address(0x9B0C89b9E698Aa887Ee51AF06eF63DBfBDE2bADc)]=true; 
       parents[address(0xbE8EAbFBE507e06c6F3D0411cfAADdBA7881e22f)]=true; 
       parents[address(0xe6f44a0969234765bE48a17aaa492E4dffE66Feb)]=true; 
     }
@@ -48,7 +49,7 @@ contract Chores is Parents{
     // Added so ether sent to this contract is reverted if the contract fails
     // otherwise, the sender's money is transferred to contract
     fallback() external payable {
-        revert("this isn't the correct way to fund the contract");
+        revert("this isn't the correct way to fund this contract");
     }
 
     /// @notice parents can start an auction
@@ -73,6 +74,22 @@ contract Chores is Parents{
         
     }//ends createAuction()
         
+    /// @notice price is calculated at current block 
+    /// 
+    /// @param _auctionId - the auction in question
+    function getCurrentAuctionPrice(uint256 _auctionId) public view returns (uint256){
+        require(_auctionId <= auctionCount, "this auction doesn't exist"); 
+        //_computeCurrentPrice was shamelessly stolen from cryptokitties
+        uint256 currentPrice = _computeCurrentPrice(
+            auctions[_auctionId].price/priceCurve, 
+            auctions[_auctionId].price, 
+            duration, 
+            block.timestamp - auctions[_auctionId].startedAt
+        );
+        
+	return currentPrice; 
+
+    }
     /// @notice Kids can bid on some chores to do. Requires a 10% bond. price is calculated at current block 
     /// change is calcualted and returned. 
     /// @param _auctionId - the auction in question
@@ -162,7 +179,7 @@ contract Chores is Parents{
         uint256 _duration,
         uint256 _secondsPassed
     )
-        internal
+       public 
         pure
         returns (uint256)
     {

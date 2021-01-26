@@ -1,14 +1,68 @@
 import { BigInt, Address } from "@graphprotocol/graph-ts"
-import { Chore, People } from "../generated/schema"
+import { Chore, People, Contract } from "../generated/schema"
 import { Purpose, Sender } from "../generated/schema"
-import { Chores, AuctionCreated, AuctionBid, ChoreCertified } from "../generated/Chores/Chores"
+import { Chores, AuctionCreated, AuctionBid, ChoreCertified, AuctionSwept } from "../generated/Chores/Chores"
+import { AddParent, RevokeParent, AuctionPaused, RugPull} from "../generated/Chores/Chores"
 import { YourContract, SetPurpose } from "../generated/YourContract/YourContract"
+
+const todo = "todo**figure out how to get contract address here"; 
+
+export function handleAddParent(event: AddParent):void{
+  let newParentString = event.params.newParent.toHexString()
+  let newParent = People.load(newParentString)
+
+  if (newParent == null) {
+    newParent = new People(newParentString)
+    newParent.address = event.params.newParent
+    newParent.createdAt = event.block.timestamp
+    newParent.amtChoresSold= BigInt.fromI32(0)
+  }
+  newParent.isParent = true
+
+  newParent.save()
+
+}
+export function handleRevokeParent(event: RevokeParent):void{
+  let parent = People.load(event.params.revokedParent.toHexString())
+    parent.isParent = false 
+    parent.save()
+}
+export function handleContractPaused (event: AuctionPaused):void{
+  let contract= Contract.load(todo)
+  if (contract == null) {
+    contract = new Contract(todo)
+  }
+    event.params.pausedState ?
+    contract.contractStatus = "paused"
+    :
+    contract.contractStatus = "UnPaused"
+
+    contract.paused= event.params.pausedState
+  contract.save()
+
+}
+export function handleRugPull(event: RugPull):void{
+  let contract= Contract.load(todo)
+  if (contract == null) {
+    contract = new Contract(todo)
+  }
+    contract.contractStatus = "rug pulled. sorry"
+  contract.save()
+}
+
+export function handleAuctionSweep(event: AuctionSwept): void {
+  let chore = Chore.load(event.params.auctionId.toString())
+  chore.sweeper = event.params.sweeper.toHexString()
+  chore.price = event.params.price
+  chore.choreStatus = "swept"
+  chore.save()
+}
 
 export function handleChoreCertified(event: ChoreCertified): void {
   let chore = Chore.load(event.params.auctionId.toString())
   chore.certifiedBy = event.params.certifier.toHexString()
-  chore.price = event.params.price
-
+  //chore.price = event.params.price
+  chore.choreStatus = "certified"
   chore.save()
 }
 
@@ -28,6 +82,7 @@ export function handleAuctionBid(event: AuctionBid): void {
 
   let chore = Chore.load(event.params.auctionId.toString())
 
+  chore.choreStatus = "bid"
   chore.bid = event.params.totalPrice
   chore.buyer = buyerString
   chore.createdAt = event.block.timestamp
@@ -46,6 +101,7 @@ export function handleNewAuction(event: AuctionCreated): void {
     seller.address = event.params.creator
     seller.createdAt = event.block.timestamp
     seller.amtChoresSold= BigInt.fromI32(1)
+    seller.isParent = true
   }
   else {
     seller.amtChoresSold= seller.amtChoresSold.plus(BigInt.fromI32(1))
@@ -54,9 +110,9 @@ export function handleNewAuction(event: AuctionCreated): void {
   let chore = new Chore(event.params.auctionId.toString())
 
   chore.chore = event.params.chore
+  chore.choreStatus = "open"
   chore.price = event.params.price
   chore.seller = sellerString 
-  chore.buyer = "ASDF" 
   chore.createdAt = event.block.timestamp
   chore.transactionHash = event.transaction.hash.toHex()
 

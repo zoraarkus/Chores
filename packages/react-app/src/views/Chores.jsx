@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
 
-import React, { useState, yourLocalBalance } from "react";
+import React, { useState, useEffect,  yourLocalBalance } from "react";
 import "antd/dist/antd.css";
 import { Button, Typography, Table, Input } from "antd";
 import { useQuery, gql } from '@apollo/client';
@@ -9,14 +9,18 @@ import GraphiQL from 'graphiql';
 import 'graphiql/graphiql.min.css';
 import FunctionForm from "../components/Contract/FunctionForm";
 import SimpleBalance from "../components/SimpleBalance";
+import Account from "../components/Account";
+import CurrentAuctionPrice from "../components/CurrentAuctionPrice";
 //import { Header, Account, Faucet, Ramp, Contract, GasGauge } from "./components";
 import fetch from 'isomorphic-fetch';
 import { parseUnits, parseEther, formatEther } from "@ethersproject/units";
+import { ethers } from "ethers";
+import { usePoller } from "eth-hooks";
 
-  const highlight = { marginLeft: 4, marginRight: 8, backgroundColor: "#f9f9f9", padding: 4, borderRadius: 4, fontWeight: "bolder" }
+
+const highlight = { marginLeft: 4, marginRight: 8, backgroundColor: "#f9f9f9", padding: 4, borderRadius: 4, fontWeight: "bolder" }
 
 function Chores(props) {
-
   function graphQLFetcher(graphQLParams) {
     console.log(props.subgraphUri); 
     return fetch(props.subgraphUri, {
@@ -28,6 +32,11 @@ function Chores(props) {
 
   const EXAMPLE_GRAPHQL = `
   {
+    contracts{
+    id
+    paused
+    contractStatus
+    }
     peoples {
      id
      choresSold
@@ -36,10 +45,14 @@ function Chores(props) {
      id
      chore 
       price
+    bid
       createdAt
       certifiedBy{id}
      buyer {id}
       seller{id}
+	choreStatus
+	sweeper
+	transactionHash
     }
   }
   `
@@ -57,73 +70,93 @@ function Chores(props) {
       key: 'chore',
     },
     {
-      title: 'seller',
-      key: 'id',
-      render: (record) => <Address
-                        value={record.seller.id}
-                        fontSize={16}
-                      />
+      title: 'status',
+      key: 'choreStatus',
+      render: (record) => <div style={{  }}>
+	{ record.choreStatus }
+            </div>
+    },
+    {
+      title: 'price: max/bid',
+      key: 'final price',
+      render: (record) => 
+	<div style={{ marginTop: 5 }}>
+	    <SimpleBalance
+		size={14}
+		balance={record.price}
+		dollarMultiplier={props.price}
+		/>
+	{! record.buyer ? 
+	    <CurrentAuctionPrice
+		id={record.id}
+		readContracts={props.readContracts}
+		dollarMultiplier={props.price}
+		startTime={record.createdAt }
+		pollTime={1000}
+		price={record.price}
+		size={14}
+		/>
+	:
+	    <SimpleBalance
+		size={14}
+		balance={record.bid}
+		dollarMultiplier={props.price}
+		/>
+	}
+
+	</div>
     },
     {
       title: 'buyer',
       key: 'id',
       render: (record) => 
-        record.buyer ?  <Address value={record.buyer.id} fontSize={16} />
-                    : "no buyer yet"
+        record.buyer ?  
+            <Address value={record.buyer.id} fontSize={15} />
+                    
+        : 
+	<div>
+            <Button onClick={()=>{
+		console.log("record.price", record.price); 
+		var p = parseEther(formatEther(record.price)).div(10)
+		props.tx( props.writeContracts.Chores.bid(record.id,{
+		    value: p 
+		}))
+              }}>Bid 
+            </Button>
+		
+	    <CurrentAuctionPrice
+		size={14}
+		id={record.id}
+		readContracts={props.readContracts}
+		dollarMultiplier={props.price}
+		startTime={record.createdAt }
+		pollTime={1000}
+		price={ethers.BigNumber.from(record.price).div(10)}
+		/>
+		<div style={{fontSize : 5 }}>
+			*refundable 10% bond paid back on certification
+		</div>
+	</div>
     },
     {
       title: 'certifier',
       key: 'id',
       render: (record) =>
-          <Address value={record.certifiedBy ? record.certifiedBy.id : ""} fontSize={16} />
-    },
-    {
-      title: 'status',
-      key: 'status',
-      render: (record) => <div style={{ marginTop: 32 }}>
-          {record.buyer?"already bought":"go nuts"}
-            </div>
-    },
-    {
-      title: 'price',
-      key: 'price',
-      render: (record) => <div style={{ marginTop: 5 }}>
-	    <SimpleBalance
-		balance={record.price}
-		dollarMultiplier={props.price}
-		/>
-            </div>
-    },
-    {
-      title: 'Action',
-      key: 'asdf',
-      dataIndex: '',
-        render: (record) =>
-        ! record.buyer 
-            ?
-        <div>
-            <Button onClick={()=>{
-			console.log("record.price", record.price); 
-                var p = parseEther(formatEther(record.price))
-			p = p.div(10)
-                props.tx( props.writeContracts.Chores.bid(record.id,{
-                    //value: parseEther("1") !!works!! don't fuck with it
-                    value: p 
-            }))
-              }}>Bid
-            </Button>
-	    <SimpleBalance
-		balance={parseEther(formatEther(record.price)).div(10)}
-		dollarMultiplier={props.price}
-		/>
-
-
-        </div>
-            :
+        record.choreStatus == "bid" ?
             <Button onClick={()=>{
                 props.tx( props.writeContracts.Chores.certifyWork(record.id))
             }}>Certify </Button>
-        
+        : record.choreStatus == "certified" ?
+            <Address value={record.certifiedBy.id} fontSize={15} />
+        : ""
+    },
+    {
+      title: 'seller',
+      key: 'id',
+      render: (record) => <Address
+                        value={record.seller.id}
+                        fontSize={15}
+                      />
     },
     {
       title: 'Created At',
@@ -145,6 +178,16 @@ function Chores(props) {
       <>
 
           <div style={{padding:64}}>
+        <div style={{ float: "left" }}>
+            <Account
+            address={props.writeContracts?props.writeContracts.Chores.address:"loading...."}
+            localProvider={props.localProvider}
+            injectedProvider={props.userProvider}
+            mainnetProvider={props.mainnetProvider}
+            price={0}
+            />
+            {props.writeContracts.Chores.name}
+        </div>
           ...
           </div>
           <div style={{width:780, margin: "auto", paddingBottom:64}}>

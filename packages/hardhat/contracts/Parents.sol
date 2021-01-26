@@ -7,6 +7,12 @@ import "./CircuitBreaker.sol";
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Parents is CircuitBreaker {
+
+    event AddParent     (address newParent, address initiator);
+    event RevokeParent  (address revokedParent, address initiator);
+    event AuctionPaused (address initiator, bool pausedState);
+    event RugPull       (address initiator);
+
     mapping(address=> bool) public parents; 
 
   /**
@@ -34,6 +40,7 @@ contract Parents is CircuitBreaker {
     require(newParent != msg.sender, "you're already here. what are you doing"); 
     
     parents[newParent] = true; 
+    emit AddParent (newParent, msg.sender); 
   }
 
   /**
@@ -43,14 +50,24 @@ contract Parents is CircuitBreaker {
   function revokeParenthood(address revoked) public onlyParents {
     require (revoked != address(0), "not allowed to revoke the 0x0 address fool");
     require (revoked != msg.sender, "you can't revoke yourself."); 
+    require (parents[revoked], "wtf? this parent has already been revoked, or doesn't exist"); 
       parents[revoked] = false; 
+    emit RevokeParent (revoked, msg.sender); 
   }
   
     /**
    * @dev Allows any Parent to pause the contract 
    */
+  function togglePauseContract() public onlyParents {
+      stopped = ! stopped; 
+      emit AuctionPaused (msg.sender, stopped);
+  }
+    /**
+   * @dev Allows any Parent to pause the contract 
+   */
   function pauseContract() public onlyParents {
       stopped = true; 
+      emit AuctionPaused (msg.sender, stopped);
   }
   
     /**
@@ -58,5 +75,6 @@ contract Parents is CircuitBreaker {
    */
   function rugPull() public onlyParents onlyInEmergency{
         selfdestruct(msg.sender);
+        emit RugPull(msg.sender); 
   }
 }

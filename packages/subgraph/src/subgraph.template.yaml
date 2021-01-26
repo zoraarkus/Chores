@@ -26,6 +26,18 @@ dataSources:
           handler: handleAuctionBid
         - event: ChoreCertified(uint256,uint256,address,address)
           handler: handleChoreCertified
+        - event: AuctionSwept(uint256,uint256,address)
+          handler: handleAuctionSweep 
+        - event: AuctionSwept(uint256,uint256,address)
+          handler: handleAuctionSweep
+        - event: AddParent(address,address)
+          handler: handleAddParent
+        - event: RevokeParent(address,address)
+          handler: handleRevokeParent
+        - event: AuctionPaused(address,bool)
+          handler: handleContractPaused 
+        - event: RugPull(address)
+          handler: handleRugPull
       file: ./src/mapping.ts
   - kind: ethereum/contract
     name: YourContract

@@ -8,7 +8,9 @@ contract CircuitBreaker {
 
     bool public stopped = false;
 
-    modifier stopInEmergency { require(!stopped); _; }
-    modifier onlyInEmergency { require(stopped); _; }
+    modifier stopInEmergency { require(!stopped, 
+            "Sorry, something has gone horribly wrong and this contract is paused"); _; }
+    modifier onlyInEmergency { require(stopped, 
+            "Sorry, you are only able to call this function when this contract is paused"); _; }
 
 }

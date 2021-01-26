@@ -11,7 +11,7 @@ import { useExchangePrice, useGasPrice, useUserProvider, useContractLoader, useC
 import { Header, Account, Faucet, Ramp, Contract, GasGauge } from "./components";
 import { Transactor } from "./helpers";
 import { formatEther } from "@ethersproject/units";
-import { Hints, ExampleUI, Subgraph, Chores } from "./views"
+import { Hints, ExampleUI, Subgraph, Chores, Admin} from "./views"
 /*
     Welcome to 🏗 scaffold-eth !
 
@@ -132,6 +132,7 @@ function App(props) {
       <BrowserRouter>
 
         <Menu style={{ textAlign:"center" }} selectedKeys={[route]} mode="horizontal">
+            {/*
           <Menu.Item key="/">
             <Link onClick={()=>{setRoute("/")}} to="/">YourContract</Link>
           </Menu.Item>
@@ -141,11 +142,24 @@ function App(props) {
           <Menu.Item key="/exampleui">
             <Link onClick={()=>{setRoute("/exampleui")}} to="/exampleui">ExampleUI</Link>
           </Menu.Item>
+          <Menu.Item key="/admin">
+            <Link onClick={()=>{setRoute("/admin")}} to="/admin">Admin</Link>
+          </Menu.Item>
           <Menu.Item key="/chores">
             <Link onClick={()=>{setRoute("/chores")}} to="/chores">Chores</Link>
           </Menu.Item>
           <Menu.Item key="/subgraph">
             <Link onClick={()=>{setRoute("/subgraph")}} to="/subgraph">Subgraph</Link>
+          </Menu.Item>
+          */}
+          <Menu.Item key="/admin">
+            <Link onClick={()=>{setRoute("/admin")}} to="/admin">Admin</Link>
+          </Menu.Item>
+          <Menu.Item key="/chores">
+            <Link onClick={()=>{setRoute("/chores")}} to="/chores">Chores</Link>
+          </Menu.Item>
+          <Menu.Item key="/">
+            <Link onClick={()=>{setRoute("/")}} to="/">YourContract</Link>
           </Menu.Item>
         </Menu>
 
@@ -198,6 +212,20 @@ function App(props) {
               setPurposeEvents={setPurposeEvents}
             />
           </Route>
+          <Route path="/admin">
+            <Admin
+	    address={address}
+	    userProvider={userProvider}
+	    mainnetProvider={mainnetProvider}
+	    localProvider={localProvider}
+	    yourLocalBalance={yourLocalBalance}
+	    price={price}
+            tx={tx}
+            subgraphUri={props.subgraphUri}
+              readContracts={readContracts}
+            writeContracts={writeContracts}
+            />
+          </Route>
           <Route path="/chores">
             <Chores
 	    address={address}
@@ -208,6 +236,7 @@ function App(props) {
 	    price={price}
             tx={tx}
             subgraphUri={props.subgraphUri}
+              readContracts={readContracts}
             writeContracts={writeContracts}
             />
           </Route>

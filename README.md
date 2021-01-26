@@ -1,16 +1,33 @@
-//scaffold-eth shamelessly stolen from the great Austin Griffith. thank you.  
+//# 🏗 scaffold-eth shamelessly stolen from the great Austin Griffith. thank you.  
 >  my first attempt writing a solidity project. 
 > do not use for real funds!! only as a concept to graduate :)
 ## motivation!
 
 a simple auction where a Parent can put up a reverse auction for a chore to do. 
 Parents createAuction() that starts at 1/10 msg.value and after $DURATION minutes will reach maximum value linearly. 
-kids are incentivized to underbid  their sister for the work. createing a truer market price for something like "the dishes" 
-when kids bid(), they must put up a bond  for 1/10 the currentAuctionPrice that goes into the contract. 
-She can only get this back + bidAmount if a Parent certifies() her work. 
+kids are incentivized to underbid  their sister for the work. trying to find a true market price for something like "do the dishes" 
+when kids bid(), they must put up a bond  for 1/10 the currentAuctionPrice that goes into the contract. DDOS protection.
+they can only get this back + bidAmount if a Parent certifies() her work. 
 
-this is not a real auction and I've made some assumptions that make it a simpler project. 
+Initally I had grand plans and this was going ot be more elaborate that it actually turned out. Rather than refactoring and simplifying my contracts, I left them extensible and hard-coded some assumptions that make it a simpler project. 
 
+The project is basically 3x parts: 
+
+#1 - blockchain/contracts locations in packages/hardhat/ 
+    I shamelessly stole the auction concept/code  form the cryptokitties contract /0x06012c8cf97bead5deae237070f9587f8e7a266d
+#2 - graph node/subgraph  lives in packeages/subgraph/
+#3 - react frontend lives in packages/react-app/ 
+
+Most everything is copy/pasta'd from scaffold-eth with the exception of the following: 
+    - contratcs (Chores.sol Parents.sol CircuitBreaker.sol) in packages/hardhat/contracts/
+    - subgraph build (mapping.ts schema.graphql subgraph.template.yaml
+    - react components (CurrentAuctionPrice.jsx SimpleBalance.jsx) in /packages/react-app/src/components. 
+    - react views (Chores.jsx Admin.jsx) in packages/react-app/src/components/ 
+
+Since I'm running ubuntu as a guest VirtualBox in a Windows 10 host, I had to: 
+    - configure docker networking to look at the localblockchain here 
+      ethereum: 'localhost:http://10.0.2.15:8545'
+    - configure hardhat to use --hostname 0.0.0.0 
 
 <!-- 
 

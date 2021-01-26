@@ -1,12 +1,19 @@
+type Contract @entity {
+  id: ID!
+  contractStatus: String!
+  paused: Boolean! 
+}
 type Chore @entity {
   id: ID!
-  seller: People!
-  buyer: People
   chore: String!
-  createdAt: BigInt!
   price: BigInt
   bid: BigInt
+  createdAt: BigInt!
   certifiedBy: People
+  seller: People!
+  buyer: People
+  choreStatus: String!
+  sweeper: People
   transactionHash: String!
 }
 
@@ -17,6 +24,7 @@ type People @entity {
   choresSold: [Chore!] @derivedFrom(field: "seller")
   amtChoresSold: BigInt
   amtChoresBought: BigInt
+  isParent: Boolean 
 }
 
 type Purpose @entity {
