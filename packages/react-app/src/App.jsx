@@ -93,6 +93,10 @@ function App(props) {
 
 
   // keep track of a variable from the contract in the local React state:
+  const paused = useContractReader(readContracts,"Chores", "stopped")
+  console.log("🤗 paused:",paused)
+
+  // keep track of a variable from the contract in the local React state:
   const purpose = useContractReader(readContracts,"YourContract", "purpose")
   console.log("🤗 purpose:",purpose)
 
@@ -155,11 +159,11 @@ function App(props) {
           <Menu.Item key="/admin">
             <Link onClick={()=>{setRoute("/admin")}} to="/admin">Admin</Link>
           </Menu.Item>
-          <Menu.Item key="/chores">
-            <Link onClick={()=>{setRoute("/chores")}} to="/chores">Chores</Link>
-          </Menu.Item>
           <Menu.Item key="/">
-            <Link onClick={()=>{setRoute("/")}} to="/">YourContract</Link>
+            <Link onClick={()=>{setRoute("/")}} to="/">Chores</Link>
+          </Menu.Item>
+          <Menu.Item key="/debug">
+            <Link onClick={()=>{setRoute("/debug")}} to="/debug">DEBUG</Link>
           </Menu.Item>
         </Menu>
 
@@ -170,14 +174,18 @@ function App(props) {
                 this <Contract/> component will automatically parse your ABI
                 and give you a form to interact with it locally
             */}
-            <Contract
-              name="Chores"
-              signer={userProvider.getSigner()}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
+            <Chores
+		address={address}
+		userProvider={userProvider}
+		mainnetProvider={mainnetProvider}
+		localProvider={localProvider}
+		yourLocalBalance={yourLocalBalance}
+		price={price}
+		tx={tx}
+		subgraphUri={props.subgraphUri}
+		readContracts={readContracts}
+		writeContracts={writeContracts}
             />
-
             { /* Uncomment to display and interact with an external contract (DAI on mainnet):
             <Contract
               name="DAI"
@@ -188,6 +196,15 @@ function App(props) {
               blockExplorer={blockExplorer}
             />
             */ }
+          </Route>
+          <Route path="/debug">
+            <Contract
+              name="Chores"
+              signer={userProvider.getSigner()}
+              provider={localProvider}
+              address={address}
+              blockExplorer={blockExplorer}
+            />
           </Route>
           <Route path="/hints">
             <Hints
@@ -214,6 +231,7 @@ function App(props) {
           </Route>
           <Route path="/admin">
             <Admin
+	    paused={paused}
 	    address={address}
 	    userProvider={userProvider}
 	    mainnetProvider={mainnetProvider}

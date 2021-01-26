@@ -10,6 +10,7 @@ import 'graphiql/graphiql.min.css';
 import FunctionForm from "../components/Contract/FunctionForm";
 import Account from "../components/Account";
 import SimpleBalance from "../components/SimpleBalance";
+import Balance from "../components/Balance";
 import AddressInput from "../components/AddressInput";
 import CurrentAuctionPrice from "../components/CurrentAuctionPrice";
 //import { Header, Account, Faucet, Ramp, Contract, GasGauge } from "./components";
@@ -55,8 +56,31 @@ function Chores(props) {
   const peopleColumns= [
     {
       title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
+      key: '',
+      render: (record) => 
+            <Address
+	    style={{width:200}}
+            value={record.id}
+            localProvider={props.localProvider}
+            injectedProvider={props.userProvider}
+            mainnetProvider={props.mainnetProvider}
+            fontSize={14}
+            size={"long"}
+            />
+
+    },
+    {
+      title: 'balance',
+      key: '',
+      render: (record) => 
+            <Balance
+	    address={record.id}
+	    provider={props.localProvider}
+	    dollarMultiplier={props.price}
+	    style={{width:200}}
+            fontSize={14}
+            />
+
     },
     {
       title: 'is parent?',
@@ -78,7 +102,7 @@ function Chores(props) {
   const [newChoreAmount,  setNewChoreAmount] = useState(0);
   const [addedParent, addParent] = useState();
   const [revokedParent, revokeParent] = useState();
-  const [paused, pauseContract] = useState("loading...");
+  const [paused, pauseContract] = useState();
   const [rugged, rugPull] = useState("loading...");
 
 
@@ -97,7 +121,7 @@ function Chores(props) {
             mainnetProvider={props.mainnetProvider}
             price={0}
             />
-            {"Chores:ADMIN"}
+            {"ADMINISTRIVIA"}
 
 
     <div style={{ width:400,marginTop:8,border:"1px solid #cccccc",padding:8}}>
@@ -130,12 +154,13 @@ function Chores(props) {
 	<div style={{ width:400,marginTop:8,border:"1px solid #cccccc",padding:8}}>
               <Button onClick={()=>{
                 props.tx( props.writeContracts.Chores.togglePauseContract()) 
-            }}>Pause/Unpause this contract</Button>
+            }}>{props.paused ? "unpause" : "pause"  } this contract</Button>
+		
 	</div>
 	<div style={{ width:400,marginTop:8,border:"1px solid #cccccc",padding:8}}>
               <Button onClick={()=>{
                 props.tx( props.writeContracts.Chores.rugPull()) 
-            }}>rugpull this bitch</Button>
+            }}>pull the rug from everyone and run!</Button>
 	</div>
 <br/>
           <div style={{width:780, margin: "auto", paddingBottom:64}}>

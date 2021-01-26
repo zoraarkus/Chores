@@ -39,7 +39,6 @@ function Chores(props) {
     }
     peoples {
      id
-     choresSold
     }
     chores(first: 25, orderBy: createdAt, orderDirection: desc) {
      id
