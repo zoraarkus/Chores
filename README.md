@@ -1,6 +1,18 @@
 //# 🏗 scaffold-eth shamelessly stolen from the great Austin Griffith. thank you.  
 >  my first attempt writing a solidity project. 
 > do not use for real funds!! only as a concept to graduate :)
+**Qualifier**
+This is my first foray into all these cool things. 
+	- git 
+	- npm 
+	- react 
+	- solidity 
+	- graph-ql 
+	- docker 
+	- hardhat
+	- chai 
+THere's probably lots of WTF's in here. 
+
 ## motivation!
 
 a simple auction where a Parent can put up a reverse auction for a chore to do. 
